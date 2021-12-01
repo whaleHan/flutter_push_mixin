@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 class FlutterPushMixin {
-  static const EventChannel _channel = EventChannel('flutter_push_mixin');
+  static const BasicMessageChannel _channel = BasicMessageChannel('flutter_push_mixin', StringCodec());
 
   static const String _init = 'init_channel_push_mix';
 
@@ -15,31 +15,33 @@ class FlutterPushMixin {
     required Function(RegIdModel model) getId,
     required Function(PushModel model) getMessage,
   }) async* {
-    final Stream _stream = _channel.receiveBroadcastStream(_init);
 
-    _stream.listen((event) {
-      log.d('flutter_push_mixin -> : $event');
+    _channel.setMessageHandler((message) async{
+      log.d('flutter_push_mixin -> : $message');
 
-      if (event == 'ok') {
+      if (message == 'ok') {
 
         log.d('flutter_push_mixin -> : 初始化完成');
 
-      } else if (event is Map) {
-        if (event['regId'] != null) {
+      } else if (message is Map) {
+        if (message['regId'] != null) {
           log.d('flutter_push_mixin -> : 成功获取regId');
 
-          RegIdModel _model = RegIdModel.fromJson(event as Map<String, dynamic>);
+          RegIdModel _model = RegIdModel.fromJson(message as Map<String, dynamic>);
 
           getId(_model);
         } else {
-          log.d('flutter_push_mixin -> : 成功获取regId');
+          log.d('flutter_push_mixin -> : 获取到消息');
 
-          PushModel _model = PushModel.fromJson(event as Map<String, dynamic>);
+          PushModel _model = PushModel.fromJson(message as Map<String, dynamic>);
 
           getMessage(_model);
         }
       }
     });
+
+    _channel.send(_init);
+
   }
 }
 

@@ -3,14 +3,13 @@ package com.example.flutter_push_mixin
 import androidx.annotation.NonNull
 import com.mixpush.core.GetRegisterIdCallback
 import com.mixpush.core.MixPushPlatform
-import io.flutter.plugin.common.EventChannel
-import java.util.*
+import io.flutter.plugin.common.BasicMessageChannel
 
 class GetId: GetRegisterIdCallback() {
-    private var events: EventChannel.EventSink? = null
+    private lateinit var reply: BasicMessageChannel.Reply<Any>
 
-    fun init(@NonNull events: EventChannel.EventSink?) {
-        this.events = events;
+    fun init(@NonNull reply: BasicMessageChannel.Reply<Any>) {
+        this.reply = reply
     }
 
 
@@ -20,6 +19,6 @@ class GetId: GetRegisterIdCallback() {
             "regId" to platform?.regId
         )
 
-        events?.success(map);
+        reply.reply(map)
     }
 }

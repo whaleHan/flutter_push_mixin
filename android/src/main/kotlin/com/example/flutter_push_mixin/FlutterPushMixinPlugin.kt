@@ -2,61 +2,54 @@ package com.example.flutter_push_mixin
 
 import android.content.Context
 import androidx.annotation.NonNull
-import com.mixpush.core.GetRegisterIdCallback
 import com.mixpush.core.MixPushClient
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.EventChannel
-import io.flutter.plugin.common.EventChannel.StreamHandler
+import io.flutter.plugin.common.BasicMessageChannel
+import io.flutter.plugin.common.BasicMessageChannel.MessageHandler
+import io.flutter.plugin.common.StandardMessageCodec
 
-/** FlutterPushMixinPlugin */
-class FlutterPushMixinPlugin : FlutterPlugin, StreamHandler {
+class FlutterPushMixinPlugin() : FlutterPlugin, MessageHandler<Any>{
+    private var initChannel: String = "init_channel_push_mix"
 
-    private var initChannel: String = "init_channel_push_mix";
+    private var push: MyPushReceiver = MyPushReceiver()
 
-    private var push: MyPushReceiver = MyPushReceiver();
+    private var pushClient: MixPushClient = MixPushClient()
 
-    private var pushClient: MixPushClient = MixPushClient();
+    private var getId: GetId = GetId()
 
-    private var getId: GetId = GetId();
+    private lateinit var channel: BasicMessageChannel<Any>
 
-    private lateinit var channel: EventChannel;
-
-    private lateinit var context: Context;
+    private lateinit var context: Context
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = EventChannel(flutterPluginBinding.binaryMessenger, "flutter_push_mixin")
+        channel = BasicMessageChannel(flutterPluginBinding.binaryMessenger, "flutter_push_mixin", StandardMessageCodec.INSTANCE)
 
-        channel.setStreamHandler(this);
+        channel.setMessageHandler(this)
 
-        context = flutterPluginBinding.applicationContext;
+        context = flutterPluginBinding.applicationContext
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        channel.setStreamHandler(null);
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMessageHandler(null)
     }
 
-    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        when (arguments) {
+    override fun onMessage(message: Any?, reply: BasicMessageChannel.Reply<Any>) {
+        when (message) {
             initChannel -> {
-                push.initPush(events);
+                push.initPush(reply)
 
-                getId.init(events);
+                getId.init(reply)
 
-                pushClient.setPushReceiver(push);
-
+                pushClient.setPushReceiver(push)
 
                 pushClient.getRegisterId(context, getId)
 
-                events?.success("ok");
+                reply.reply("ok")
             }
             else -> {
-                events?.endOfStream();
+                print("收到消息: $message")
             }
         }
-    }
-
-    override fun onCancel(arguments: Any?) {
-//        channel.setStreamHandler(null)
     }
 }

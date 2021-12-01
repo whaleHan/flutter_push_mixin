@@ -5,19 +5,17 @@ import androidx.annotation.NonNull
 import com.mixpush.core.MixPushMessage
 import com.mixpush.core.MixPushPlatform
 import com.mixpush.core.MixPushReceiver
-import io.flutter.plugin.common.EventChannel
-import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.BasicMessageChannel
 
 class MyPushReceiver : MixPushReceiver() {
-    private var events: EventChannel.EventSink? = null
+    private lateinit var reply: BasicMessageChannel.Reply<Any>
 
-    fun initPush(events: EventChannel.EventSink?) {
-        this.events = events;
+    fun initPush(@NonNull reply: BasicMessageChannel.Reply<Any>) {
+        this.reply = reply
     }
 
     @Override
     override fun onRegisterSucceed(context: Context?, mixPushPlatform: MixPushPlatform?) {
-// 默认初始化5个推送平台（小米推送、华为推送、魅族推送、OPPO推送、VIVO推送），以小米推荐作为默认平台
 // 默认初始化5个推送平台（小米推送、华为推送、魅族推送、OPPO推送、VIVO推送），以小米推荐作为默认平台
     }
 
@@ -32,6 +30,6 @@ class MyPushReceiver : MixPushReceiver() {
             "passThrough" to message?.isPassThrough
         )
 
-        events?.success(map)
+        reply.reply(map)
     }
 }
