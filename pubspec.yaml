@@ -11,7 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   logger: ^1.0.0 #输出
-
+  flutter_apns_only: ^1.5.2 #获取apnsToken
+  permission_handler: ^9.2.0 #获取权限
 dev_dependencies:
   flutter_test:
     sdk: flutter

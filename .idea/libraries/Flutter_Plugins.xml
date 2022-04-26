@@ -2,6 +2,8 @@
   <library name="Flutter Plugins" type="FlutterPluginsLibraryType">
     <CLASSES>
       <root url="file://$PROJECT_DIR$" />
+      <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_apns_only-1.5.2" />
+      <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.flutter-io.cn/permission_handler-9.2.0" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

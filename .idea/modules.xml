@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/flutter_push_mixin.iml" filepath="$PROJECT_DIR$/flutter_push_mixin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/flutter_push_mixin_android.iml" filepath="$PROJECT_DIR$/android/flutter_push_mixin_android.iml" />
     </modules>
   </component>
 </project>
