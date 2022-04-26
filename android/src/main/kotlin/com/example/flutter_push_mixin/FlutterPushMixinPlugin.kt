@@ -114,6 +114,11 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
                 println("开始初始化: ${call.method}")
                 result.success(true)
             }
+            "getId" -> {
+                println("获取id getId")
+
+                pushClient.getRegisterId(context, getId)
+            }
             else -> {
                 println("接受到消息: ${call.method}")
                 result.notImplemented()
