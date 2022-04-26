@@ -9,10 +9,10 @@ import 'package:logger/logger.dart';
 import 'package:notification_permissions/notification_permissions.dart';
 
 class FlutterPushMixin {
-  static const BasicMessageChannel _channel = BasicMessageChannel(
-      'flutter_push_mixin', StringCodec());
+  static const EventChannel _eventChannel = EventChannel(
+      'flutter_push_mixin_event');
 
-  static const String _init = 'init_channel_push_mix';
+  static const MethodChannel _methodChannel = MethodChannel("flutter_push_mixin_method");
 
   static Logger log = Logger();
 
@@ -21,6 +21,8 @@ class FlutterPushMixin {
     required Function(PushModel model) getMessage,
     required Function(String apnsToken) getApnsToken,
   }) async {
+    log.i("_eventChannel 通道名Flutter : ${_eventChannel.name}");
+
     PermissionStatus permissionStatus = await NotificationPermissions
         .requestNotificationPermissions(openSettings: false);
     log.i("flutter_push_mixin -> 通知栏权限: $permissionStatus");
@@ -42,31 +44,35 @@ class FlutterPushMixin {
       });
       connector.requestNotificationPermissions();
     } else {
-      _channel.setMessageHandler((message) async {
-        log.d('flutter_push_mixin -> : $message');
+      final _t = await _methodChannel.invokeMethod("init");
+      log.i('发送通知成功: $_t');
 
+      _eventChannel.receiveBroadcastStream().asBroadcastStream().listen((message) {
         if (message == 'ok') {
           log.d('flutter_push_mixin -> : 初始化完成');
         } else if (message is Map) {
-          if (message['regId'] != null) {
-            log.d('flutter_push_mixin -> : 成功获取regId');
+          log.d('Flutter 获取到的Map消息: $message');
+          try{
+            if (message['regId'] != null) {
+              log.d('flutter_push_mixin -> : 成功获取regId');
 
-            RegIdModel _model = RegIdModel.fromJson(
-                message as Map<String, dynamic>);
+              RegIdModel _model = RegIdModel.fromJson(
+                  Map<String, dynamic>.from(message));
 
-            getId(_model);
-          } else {
-            log.d('flutter_push_mixin -> : 获取到消息');
+              getId(_model);
+            } else {
+              log.d('flutter_push_mixin -> : 获取到消息');
 
-            PushModel _model = PushModel.fromJson(
-                message as Map<String, dynamic>);
+              PushModel _model = PushModel.fromJson(
+                  Map<String, dynamic>.from(message) );
 
-            getMessage(_model);
+              getMessage(_model);
+            }
+          }catch(e) {
+            log.e("转换数据失败: $e");
           }
         }
       });
-
-      _channel.send(_init);
     }
   }
 }

@@ -6,11 +6,12 @@ import com.mixpush.core.MixPushMessage
 import com.mixpush.core.MixPushPlatform
 import com.mixpush.core.MixPushReceiver
 import io.flutter.plugin.common.BasicMessageChannel
+import io.flutter.plugin.common.EventChannel
 
 class MyPushReceiver : MixPushReceiver() {
-    private lateinit var reply: BasicMessageChannel.Reply<Any>
+    private var reply: EventChannel.EventSink? = null
 
-    fun initPush(@NonNull reply: BasicMessageChannel.Reply<Any>) {
+    fun initPush(@NonNull reply: EventChannel.EventSink?) {
         this.reply = reply
     }
 
@@ -30,6 +31,6 @@ class MyPushReceiver : MixPushReceiver() {
             "passThrough" to message?.isPassThrough
         )
 
-        reply.reply(map)
+        reply?.success(map)
     }
 }

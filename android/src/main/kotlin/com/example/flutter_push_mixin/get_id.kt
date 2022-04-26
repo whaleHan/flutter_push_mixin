@@ -4,21 +4,24 @@ import androidx.annotation.NonNull
 import com.mixpush.core.GetRegisterIdCallback
 import com.mixpush.core.MixPushPlatform
 import io.flutter.plugin.common.BasicMessageChannel
+import io.flutter.plugin.common.EventChannel
 
 class GetId: GetRegisterIdCallback() {
-    private lateinit var reply: BasicMessageChannel.Reply<Any>
+    private var reply: EventChannel.EventSink? = null
 
-    fun init(@NonNull reply: BasicMessageChannel.Reply<Any>) {
+    fun init(@NonNull reply: EventChannel.EventSink?) {
         this.reply = reply
+        println("GetId init");
     }
 
 
     override fun callback(platform: MixPushPlatform?) {
+        println("获取到数据： ${platform.toString()}")
         val map = mapOf(
             "platformName" to platform?.platformName,
             "regId" to platform?.regId
         )
 
-        reply.reply(map)
+        reply?.success(map)
     }
 }

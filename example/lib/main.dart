@@ -35,6 +35,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: '推送数据获取测试',
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Plugin example app'),
@@ -45,7 +46,7 @@ class _MyAppState extends State<MyApp> {
           onPressed: () {
             initPushUtil();
           },
-          child: Text('调用'),
+          child: const Text('获取RegId并复制'),
         )),
       ),
     );
