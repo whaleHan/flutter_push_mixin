@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_apns_only/flutter_apns_only.dart';
 import 'package:logger/logger.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:notification_permissions/notification_permissions.dart';
 
 class FlutterPushMixin {
   static const BasicMessageChannel _channel = BasicMessageChannel(
@@ -21,11 +21,13 @@ class FlutterPushMixin {
     required Function(PushModel model) getMessage,
     required Function(String apnsToken) getApnsToken,
   }) async {
-    await Permission.notification.request();
+    PermissionStatus permissionStatus = await NotificationPermissions
+        .requestNotificationPermissions(openSettings: false);
+    log.i("flutter_push_mixin -> 通知栏权限: $permissionStatus");
     if (Platform.isIOS) {
       final ApnsPushConnectorOnly connector = ApnsPushConnectorOnly();
       connector.configureApns(
-          onMessage: (ApnsRemoteMessage message) async{
+          onMessage: (ApnsRemoteMessage message) async {
             final PushModel _model = PushModel(
               payload: jsonEncode(message.payload),
             );
@@ -34,14 +36,13 @@ class FlutterPushMixin {
       );
       connector.token.addListener(() {
         final String? _token = connector.token.value;
-        if(_token != null) {
+        if (_token != null) {
           getApnsToken(_token);
         }
       });
       connector.requestNotificationPermissions();
     } else {
       _channel.setMessageHandler((message) async {
-
         log.d('flutter_push_mixin -> : $message');
 
         if (message == 'ok') {
