@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_push_mixin/flutter_push_mixin.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +19,17 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    initPushUtil();
+  }
+
+  Future initPushUtil() async {
+    print('开始获取ApnsToken');
+    FlutterPushMixin.initListener(
+        getId: (RegIdModel model) {},
+        getMessage: (PushModel model) {},
+        getApnsToken: (String token) {
+          print('获取到的ApnsToken: $token');
+        });
   }
 
   @override
@@ -27,8 +40,13 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+            child: CupertinoButton(
+          color: Colors.red,
+          onPressed: () {
+            initPushUtil();
+          },
+          child: Text('调用'),
+        )),
       ),
     );
   }

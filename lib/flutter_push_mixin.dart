@@ -16,11 +16,11 @@ class FlutterPushMixin {
 
   static Logger log = Logger();
 
-  static Stream<PushModel> initListener({
+  static Future initListener({
     required Function(RegIdModel model) getId,
     required Function(PushModel model) getMessage,
     required Function(String apnsToken) getApnsToken,
-  }) async* {
+  }) async {
     await Permission.notification.request();
     if (Platform.isIOS) {
       final ApnsPushConnectorOnly connector = ApnsPushConnectorOnly();
