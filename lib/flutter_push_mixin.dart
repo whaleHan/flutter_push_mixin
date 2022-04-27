@@ -22,6 +22,7 @@ class FlutterPushMixin {
     required Function(RegIdModel model) getId,
     required Function(PushModel model) getMessage,
     required Function(String apnsToken) getApnsToken,
+    Function(dynamic message)? eventLog
   }) async {
     _log.i("_eventChannel 通道名Flutter : ${_eventChannel.name}");
 
@@ -50,6 +51,7 @@ class FlutterPushMixin {
       _log.i('发送通知成功: $_t');
 
       _eventChannel.receiveBroadcastStream().asBroadcastStream().listen((message) {
+        eventLog?.call(message);
         if (message == 'ok') {
           _log.d('flutter_push_mixin -> : 初始化完成');
         } else if (message is Map) {
