@@ -16,9 +16,9 @@ class GetId: GetRegisterIdCallback() {
 
 
     override fun callback(platform: MixPushPlatform?) {
-        println("获取到数据： ${platform.toString()}")
-        if(platform?.redId) {
-            reply?.success("error")
+//        println("获取到数据： ${platform.toString()}")
+        if(platform?.regId == null) {
+            reply?.success("获取regId 失败")
         }
         val map = mapOf(
             "platformName" to platform?.platformName,
