@@ -2,6 +2,7 @@ package com.example.flutter_push_mixin
 
 import android.content.Context
 import androidx.annotation.NonNull
+import com.mixpush.core.GetRegisterIdCallback
 import com.mixpush.core.MixPushClient
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -128,14 +129,20 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
     private fun initPushCtrl() {
         println("eventSink 是否为空：${eventSink == null}")
+
+
         push.initPush(eventSink)
 
         getId.init(eventSink)
 
         pushClient.setPushReceiver(push)
 
+        pushClient.register(context)
+
         println("开始获取Id")
         pushClient.getRegisterId(context, getId)
+
+
 
         eventSink?.success("ok")
     }

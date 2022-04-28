@@ -3,7 +3,6 @@ package com.example.flutter_push_mixin
 import androidx.annotation.NonNull
 import com.mixpush.core.GetRegisterIdCallback
 import com.mixpush.core.MixPushPlatform
-import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugin.common.EventChannel
 
 class GetId: GetRegisterIdCallback() {
@@ -16,7 +15,7 @@ class GetId: GetRegisterIdCallback() {
 
 
     override fun callback(platform: MixPushPlatform?) {
-//        println("获取到数据： ${platform.toString()}")
+        println("getId获取到数据： ${platform.toString()}")
         if(platform?.regId == null) {
             reply?.success("获取regId 失败")
         }
