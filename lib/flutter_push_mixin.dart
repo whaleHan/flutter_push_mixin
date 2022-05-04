@@ -33,11 +33,33 @@ class FlutterPushMixin {
       final ApnsPushConnectorOnly connector = ApnsPushConnectorOnly();
       connector.configureApns(
           onMessage: (ApnsRemoteMessage message) async {
+            _log.i("onMessage -> ${message.payload}");
             final PushModel _model = PushModel(
               payload: jsonEncode(message.payload),
             );
             getMessage(_model);
-          }
+          },
+          onBackgroundMessage: (ApnsRemoteMessage message) async {
+            _log.i("onBackgroundMessage -> ${message.payload}");
+            final PushModel _model = PushModel(
+              payload: jsonEncode(message.payload),
+            );
+            getMessage(_model);
+          },
+        onLaunch: (ApnsRemoteMessage message) async {
+          _log.i("onLaunch -> ${message.payload}");
+          final PushModel _model = PushModel(
+            payload: jsonEncode(message.payload),
+          );
+          getMessage(_model);
+        },
+        onResume: (ApnsRemoteMessage message) async {
+            _log.i("onResume -> ${message.payload}");
+          final PushModel _model = PushModel(
+            payload: jsonEncode(message.payload),
+          );
+          getMessage(_model);
+        }
       );
       connector.token.addListener(() {
         final String? _token = connector.token.value;
