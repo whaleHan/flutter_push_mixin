@@ -34,17 +34,17 @@ class FlutterPushMixin {
       connector.configureApns(
           onMessage: (ApnsRemoteMessage message) async {
             _log.i("onMessage -> ${message.payload}");
-            final PushModel _model = PushModel(
-              payload: jsonEncode(message.payload),
-            );
-            getMessage(_model);
+            // final PushModel _model = PushModel(
+            //   payload: jsonEncode(message.payload),
+            // );
+            // getMessage(_model);
           },
           onBackgroundMessage: (ApnsRemoteMessage message) async {
             _log.i("onBackgroundMessage -> ${message.payload}");
-            final PushModel _model = PushModel(
-              payload: jsonEncode(message.payload),
-            );
-            getMessage(_model);
+            // final PushModel _model = PushModel(
+            //   payload: jsonEncode(message.payload),
+            // );
+            // getMessage(_model);
           },
         onLaunch: (ApnsRemoteMessage message) async {
           _log.i("onLaunch -> ${message.payload}");
