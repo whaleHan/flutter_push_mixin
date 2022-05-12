@@ -159,6 +159,9 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
             eventSink?.success(content)
 
+
+            intent.putExtra(BaseConstants.Extras, "");//存入参数
+
         } else {
             Log.i(TAG, "intent is null");
         }
