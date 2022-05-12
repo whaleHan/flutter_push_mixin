@@ -1,17 +1,17 @@
 package com.example.flutter_push_mixin
 
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.annotation.NonNull
-import com.mixpush.core.GetRegisterIdCallback
 import com.mixpush.core.MixPushClient
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.*
-import io.flutter.plugin.common.BasicMessageChannel.MessageHandler
 
 class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler{
-    private var initChannelStr: String = "flutter_push_mixin_event"
-    private var methodChannelStr: String = "flutter_push_mixin_method"
+
 
     private var push: MyPushReceiver = MyPushReceiver()
 
@@ -20,6 +20,7 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
     private var getId: GetId = GetId()
 
     private lateinit var methodChannel: MethodChannel
+
     private lateinit var eventChannel: EventChannel
 
     private lateinit var context: Context
@@ -28,11 +29,11 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 
-        println("_eventChannel 通道名Android : $initChannelStr")
+        println("_eventChannel 通道名Android : ${BaseConstants.initChannelStr}")
 
-        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, initChannelStr)
+        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, BaseConstants.initChannelStr)
         eventChannel.setStreamHandler(this)
-        methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, methodChannelStr)
+        methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, BaseConstants.methodChannelStr)
         methodChannel.setMethodCallHandler(this)
 
         context = flutterPluginBinding.applicationContext
@@ -130,6 +131,7 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
     private fun initPushCtrl() {
         println("eventSink 是否为空：${eventSink == null}")
 
+        getIntentData()
 
         push.initPush(eventSink)
 
@@ -147,4 +149,19 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
         eventSink?.success("ok")
     }
 
+    private fun getIntentData() {
+        val intent: Intent = Intent()
+        if (intent.extras != null && intent.getStringExtra(BaseConstants.Extras) != null) {
+
+            val content: String?  = intent.getStringExtra(BaseConstants.Extras);
+
+            Log.i(TAG, "save receive data from push, data = $content");
+
+            eventSink?.success(content)
+
+        } else {
+            Log.i(TAG, "intent is null");
+        }
+
+    }
 }

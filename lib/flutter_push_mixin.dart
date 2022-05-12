@@ -74,30 +74,56 @@ class FlutterPushMixin {
 
       _eventChannel.receiveBroadcastStream().asBroadcastStream().listen((message) {
         eventLog?.call(message);
-        if (message == 'ok') {
-          _log.d('flutter_push_mixin -> : 初始化完成');
-        } else if (message is Map) {
-          _log.d('Flutter 获取到的Map消息: $message');
-          try{
-            if (message['regId'] != null) {
-              _log.d('flutter_push_mixin -> : 成功获取regId');
+        try{
+          if (message == 'ok') {
+            _log.d('flutter_push_mixin -> : 初始化完成');
+          } else if (message is Map) {
+            _log.d('Flutter 获取到的Map消息: $message');
+            try{
+              if (message['regId'] != null) {
+                _log.d('flutter_push_mixin -> : 成功获取regId');
 
-              RegIdModel _model = RegIdModel.fromJson(
-                  Map<String, dynamic>.from(message));
+                RegIdModel _model = RegIdModel.fromJson(
+                    Map<String, dynamic>.from(message));
 
-              getId(_model);
-            } else {
-              _log.d('flutter_push_mixin -> : 获取到消息');
+                getId(_model);
+              } else {
+                _log.d('flutter_push_mixin -> : 获取到消息');
 
-              PushModel _model = PushModel.fromJson(
-                  Map<String, dynamic>.from(message) );
+                PushModel _model = PushModel.fromJson(
+                    Map<String, dynamic>.from(message) );
 
-              getMessage(_model);
+                getMessage(_model);
+              }
+            }catch(e) {
+              _log.e("转换数据失败: $e");
             }
-          }catch(e) {
-            _log.e("转换数据失败: $e");
+          } else if(message is String) {
+            Map _message = jsonDecode(message) as Map;
+            try{
+              if (_message['regId'] != null) {
+                _log.d('flutter_push_mixin -> : 成功获取regId');
+
+                RegIdModel _model = RegIdModel.fromJson(
+                    Map<String, dynamic>.from(_message));
+
+                getId(_model);
+              } else {
+                _log.d('flutter_push_mixin -> : 获取到消息');
+
+                PushModel _model = PushModel.fromJson(
+                    Map<String, dynamic>.from(_message) );
+
+                getMessage(_model);
+              }
+            }catch(e) {
+              _log.e("转换数据失败: $e");
+            }
           }
+        }catch(e, s) {
+          debugPrint("$s -> $e");
         }
+
       });
     }
   }
