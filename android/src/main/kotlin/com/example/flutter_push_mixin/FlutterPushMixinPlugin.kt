@@ -1,20 +1,17 @@
 package com.example.flutter_push_mixin
 
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.util.Log
+import android.content.*
 import androidx.annotation.NonNull
 import com.mixpush.core.MixPushClient
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.*
 
-class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, PluginRegistry.NewIntentListener{
+class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ActivityAware {
 
-
-    private var push: MyPushReceiver = MyPushReceiver()
+    private var pushReceiver: MixPushReceiver = MixPushReceiver()
 
     private var pushClient: MixPushClient = MixPushClient()
 
@@ -38,6 +35,10 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
         methodChannel.setMethodCallHandler(this)
 
         context = flutterPluginBinding.applicationContext
+
+
+        println("mixPush 注册通道 setPushReceiver(MyPushReceiver())")
+        pushClient.setPushReceiver(MixPushReceiver())
     }
 
     /**
@@ -131,10 +132,9 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
     private fun initPushCtrl() {
         println("eventSink 是否为空：${eventSink == null}")
+        pushReceiver.initReply(eventSink)
 
-        push.initPush(eventSink)
-
-        pushClient.setPushReceiver(push)
+        pushClient.setPushReceiver(pushReceiver)
 
         //发送应用关闭时的消息
         sendPushMessageByClose()
@@ -151,21 +151,21 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
     //将应用关闭时存储的消息上传
     private fun sendPushMessageByClose() {
-        println("调用: sendPushMessageByClose")
-        
+        println("mixPush调用: sendPushMessageByClose")
+
         val data: String? = getPushRecevieMsg()
-        if(data != null) {
+        if (data != null) {
             eventSink?.success(data)
         }
     }
 
     //获取应用关闭时存储的消息
     private fun getPushRecevieMsg(): String? {
-        println("调用: getPushRecevieMsg")
+        println("mixPush调用: getPushRecevieMsg")
         val preferences: SharedPreferences = context.getSharedPreferences("Push", Context.MODE_PRIVATE);
-        val data: String?  = preferences.getString("push", "");
-        println("调用: getPushRecevieMsg 获取到的数据: $data")
-        val editor: SharedPreferences.Editor  = preferences.edit();
+        val data: String? = preferences.getString("push", "");
+        println("mixPush调用: getPushRecevieMsg 获取到的数据: $data")
+        val editor: SharedPreferences.Editor = preferences.edit();
         //清理数据
         if (data?.isNotEmpty() == true) {
             editor.remove("push");
@@ -174,27 +174,69 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
         return data
     }
 
-    override fun onNewIntent(intent: Intent): Boolean {
-        println("调用： onNewIntent")
-        //获取intentData
-        getIntentData(intent);
-        return false
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        println("mixPush调用: onAttachedToActivity")
+        binding.addOnNewIntentListener(fun(intent: Intent?): Boolean {
+            println("mixPush调用: onAttachedToActivity addOnNewIntentListener")
+            intent?.let { getIntentData(it) }
+            return false;
+        })
+        getIntentData(binding.activity.intent)
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        println("mixPush调用: onReattachedToActivityForConfigChanges")
+        binding.addOnNewIntentListener(fun(intent: Intent?): Boolean {
+            println("mixPush调用: onReattachedToActivityForConfigChanges addOnNewIntentListener")
+            intent?.let { getIntentData(it) }
+            return false;
+        })
+        getIntentData(binding.activity.intent)
+    }
+
+    override fun onDetachedFromActivity() {
+        TODO("Not yet implemented")
     }
 
     //获取intentData
-    private fun getIntentData(intent: Intent ) {
-        println("调用: getIntentData")
+    private fun getIntentData(intent: Intent) {
+        println("mixPush调用: getIntentData")
         if (intent.extras != null && intent.getStringExtra(BaseConstants.Extras) != null) {
 
-            val content: String?  = intent.getStringExtra(BaseConstants.Extras);
-            Log.i(ContentValues.TAG, "save receive data from push, data = $content");
+            val content: String? = intent.getStringExtra(BaseConstants.Extras);
+            println("mixPush save receive data from push, data = $content");
 
-            if(content != null ) {
+            if (content != null) {
                 eventSink?.success(content)
                 intent.putExtra(BaseConstants.Extras, "");//存入参数
             }
         } else {
-            Log.i(ContentValues.TAG, "intent is null");
+            println("intent is null 从componentName 获取数据");
+
+            val componentName = ComponentName(context.packageName, "${context.packageName}.MainActivity")
+
+
+            println("mixPush getIntentData 包名：${context.packageName}")
+
+            val intent2 = Intent()
+            //新开一个任务栈，这样当应用处于前台，再次打开MainActivity会走 NewIntent 方法
+            //当应用处于杀死状态，会走onCreate方法
+            intent2.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent2.component = componentName
+
+            intent2.getStringExtra(BaseConstants.Extras)
+            val content: String? = intent2.getStringExtra(BaseConstants.Extras)
+
+            println("mixPush 从componentName 里获取的消息, data = $content")
+
+            if (content != null) {
+                eventSink?.success(content)
+                intent.putExtra(BaseConstants.Extras, "");//存入参数
+            }
         }
 
     }
