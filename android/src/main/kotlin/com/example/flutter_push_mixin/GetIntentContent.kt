@@ -7,7 +7,7 @@ import androidx.annotation.NonNull
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.PluginRegistry
 
-class GetIntentContent: PluginRegistry.NewIntentListener {
+class GetIntentContent: PluginRegistry.NewIntentListener{
     private var reply: EventChannel.EventSink? = null
 
     fun initPush(@NonNull reply: EventChannel.EventSink?) {
@@ -23,6 +23,7 @@ class GetIntentContent: PluginRegistry.NewIntentListener {
 
     //获取intentData
     private fun getIntentData(intent: Intent ) {
+        println("调用: getIntentData")
         if (intent.extras != null && intent.getStringExtra(BaseConstants.Extras) != null) {
 
             val content: String?  = intent.getStringExtra(BaseConstants.Extras);

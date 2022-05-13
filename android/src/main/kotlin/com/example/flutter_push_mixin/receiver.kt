@@ -52,7 +52,7 @@ class MyPushReceiver : MixPushReceiver() {
                     "passThrough" to message?.isPassThrough
             )
 
-//            reply?.success(map)
+            reply?.success(map)
         }catch (e: Error){
             Log.i(TAG, "=============Exception:"+e.toString());
         }

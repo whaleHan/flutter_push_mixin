@@ -151,6 +151,8 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
     //将应用关闭时存储的消息上传
     private fun sendPushMessageByClose() {
+        println("调用: sendPushMessageByClose")
+        
         val data: String? = getPushRecevieMsg()
         if(data != null) {
             eventSink?.success(data)
@@ -159,6 +161,7 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
     //获取应用关闭时存储的消息
     private fun getPushRecevieMsg(): String? {
+        println("调用: getPushRecevieMsg")
         val preferences: SharedPreferences = context.getSharedPreferences("Push", Context.MODE_PRIVATE);
         val data: String?  = preferences.getString("push", "");
         val editor: SharedPreferences.Editor  = preferences.edit();
