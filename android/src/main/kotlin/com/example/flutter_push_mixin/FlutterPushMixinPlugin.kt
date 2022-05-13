@@ -1,14 +1,17 @@
 package com.example.flutter_push_mixin
 
+import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.annotation.NonNull
 import com.mixpush.core.MixPushClient
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.*
 
-class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler{
+class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, PluginRegistry.NewIntentListener{
 
 
     private var push: MyPushReceiver = MyPushReceiver()
@@ -136,9 +139,6 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
         //发送应用关闭时的消息
         sendPushMessageByClose()
 
-        //监听消息
-        GetIntentContent().initPush(eventSink);
-
         getId.init(eventSink)
 
         pushClient.register(context)
@@ -164,6 +164,7 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
         println("调用: getPushRecevieMsg")
         val preferences: SharedPreferences = context.getSharedPreferences("Push", Context.MODE_PRIVATE);
         val data: String?  = preferences.getString("push", "");
+        println("调用: getPushRecevieMsg 获取到的数据: $data")
         val editor: SharedPreferences.Editor  = preferences.edit();
         //清理数据
         if (data?.isNotEmpty() == true) {
@@ -171,6 +172,31 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
             editor.commit();
         }
         return data
+    }
+
+    override fun onNewIntent(intent: Intent): Boolean {
+        println("调用： onNewIntent")
+        //获取intentData
+        getIntentData(intent);
+        return false
+    }
+
+    //获取intentData
+    private fun getIntentData(intent: Intent ) {
+        println("调用: getIntentData")
+        if (intent.extras != null && intent.getStringExtra(BaseConstants.Extras) != null) {
+
+            val content: String?  = intent.getStringExtra(BaseConstants.Extras);
+            Log.i(ContentValues.TAG, "save receive data from push, data = $content");
+
+            if(content != null ) {
+                eventSink?.success(content)
+                intent.putExtra(BaseConstants.Extras, "");//存入参数
+            }
+        } else {
+            Log.i(ContentValues.TAG, "intent is null");
+        }
+
     }
 
 }
