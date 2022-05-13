@@ -2,19 +2,19 @@
   package="com.example.flutter_push_mixin">
 
     <application
-        android:name="com.example.flutter_push_mixin.FlutterPushMixinPlugin"
+        android:name="com.example.flutter_push_mixin.MyApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="true">
-        <activity android:name="com.example.flutter_push_mixin.GetId" />
-        <activity android:name="com.example.flutter_push_mixin.WebViewActivity" />
-        <activity android:name="com.example.flutter_push_mixin.MainActivity"  android:launchMode="singleTop">
+<!--        <activity android:name="com.example.flutter_push_mixin.GetId" />-->
+<!--        <activity android:name="com.example.flutter_push_mixin.WebViewActivity" />-->
+<!--        <activity android:name="com.example.flutter_push_mixin.MainActivity"  android:launchMode="singleTop">-->
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
     </application>
 
 </manifest>
