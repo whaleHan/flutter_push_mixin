@@ -1,9 +1,7 @@
 package com.example.flutter_push_mixin
 
-import android.content.ContentValues.TAG
 import android.content.Context
-import android.content.Intent
-import android.util.Log
+import android.content.SharedPreferences
 import androidx.annotation.NonNull
 import com.mixpush.core.MixPushClient
 
@@ -135,7 +133,11 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
 
         pushClient.setPushReceiver(push)
 
-        getIntentData()
+        //发送应用关闭时的消息
+        sendPushMessageByClose()
+
+        //监听消息
+        GetIntentContent().initPush(eventSink);
 
         getId.init(eventSink)
 
@@ -147,22 +149,25 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
         eventSink?.success("ok")
     }
 
-    private fun getIntentData() {
-        val intent: Intent = Intent()
-        if (intent.extras != null && intent.getStringExtra(BaseConstants.Extras) != null) {
-
-            val content: String?  = intent.getStringExtra(BaseConstants.Extras);
-
-            Log.i(TAG, "save receive data from push, data = $content");
-
-            eventSink?.success(content)
-
-
-            intent.putExtra(BaseConstants.Extras, "");//存入参数
-
-        } else {
-            Log.i(TAG, "intent is null");
+    //将应用关闭时存储的消息上传
+    private fun sendPushMessageByClose() {
+        val data: String? = getPushRecevieMsg()
+        if(data != null) {
+            eventSink?.success(data)
         }
-
     }
+
+    //获取应用关闭时存储的消息
+    private fun getPushRecevieMsg(): String? {
+        val preferences: SharedPreferences = context.getSharedPreferences("Push", Context.MODE_PRIVATE);
+        val data: String?  = preferences.getString("push", "");
+        val editor: SharedPreferences.Editor  = preferences.edit();
+        //清理数据
+        if (data?.isNotEmpty() == true) {
+            editor.remove("push");
+            editor.commit();
+        }
+        return data
+    }
+
 }

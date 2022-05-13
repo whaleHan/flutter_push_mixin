@@ -28,7 +28,7 @@ class MyPushReceiver : MixPushReceiver() {
     override fun onNotificationMessageClicked(context: Context?, message: MixPushMessage?) {
         // TODO 通知栏消息点击触发，实现打开具体页面，打开浏览器等。
 
-        Log.i(TAG,"onNotificationMessageClicked -> 点击了消息")
+        Log.i(TAG,"onNotificationMessageClicked -> 点击了消息: ${message?.toString()}")
         try{
 
             val componentName: ComponentName  = ComponentName(context!!.packageName, "${context!!.packageName}.MainActivity");
@@ -38,7 +38,7 @@ class MyPushReceiver : MixPushReceiver() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
             intent.component = componentName;
 
-            if(message!=null){
+            if(message != null){
                 intent.putExtra(BaseConstants.Extras, message.toString());//存入参数
             }
 
@@ -52,11 +52,10 @@ class MyPushReceiver : MixPushReceiver() {
                     "passThrough" to message?.isPassThrough
             )
 
-            reply?.success(map)
+//            reply?.success(map)
         }catch (e: Error){
             Log.i(TAG, "=============Exception:"+e.toString());
         }
-
 
     }
 
