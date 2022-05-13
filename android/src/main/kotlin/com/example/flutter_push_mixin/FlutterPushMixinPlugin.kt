@@ -131,20 +131,18 @@ class FlutterPushMixinPlugin() : FlutterPlugin, MethodChannel.MethodCallHandler,
     private fun initPushCtrl() {
         println("eventSink 是否为空：${eventSink == null}")
 
-        getIntentData()
-
         push.initPush(eventSink)
 
-        getId.init(eventSink)
-
         pushClient.setPushReceiver(push)
+
+        getIntentData()
+
+        getId.init(eventSink)
 
         pushClient.register(context)
 
         println("开始获取Id")
         pushClient.getRegisterId(context, getId)
-
-
 
         eventSink?.success("ok")
     }

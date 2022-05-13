@@ -28,6 +28,7 @@ class MyPushReceiver : MixPushReceiver() {
     override fun onNotificationMessageClicked(context: Context?, message: MixPushMessage?) {
         // TODO 通知栏消息点击触发，实现打开具体页面，打开浏览器等。
 
+        Log.i(TAG,"onNotificationMessageClicked -> 点击了消息")
         try{
 
             val componentName: ComponentName  = ComponentName(context!!.packageName, "${context!!.packageName}.MainActivity");
